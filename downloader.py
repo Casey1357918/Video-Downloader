@@ -1,33 +1,42 @@
+
 import yt_dlp
-import ffmpeg
-import ffmpeg_downloader as ffmpeg
 import os
-from datetime import datetime
 from pathlib import Path
 
-
-
-
 base_dir = Path(__file__).resolve().parent
-ffmpeg_path=str(base_dir)+"\\ffmpeg\\bin\\ffmpeg.exe"
-
-def download(url , download_path):
-    
-    if download_path == "":
-        download_path='C:\\Users\\'+os.getenv('username')+'\\Downloads'
-    
-    
-    output_name='%(title)s.%(ext)s'
-    if '#' in output_name:
-        output_name=output_name[0:output_name.index('#')]
+ffmpeg_path = base_dir / 'ffmpeg' / 'bin' / 'ffmpeg.exe'
 
 
+def download(url, download_path):
 
-    options={ 'outtmpl': output_name, 'format': 'bv*+ba/b', 'ffmpeg_location': ffmpeg_path, 'wait-for-video': 5, 'wait-for-video-retries': 100000000000, 'paths': {'home': download_path}}
-    
-    try:
-        with yt_dlp.YoutubeDL(options) as ydl:
-            ydl.download([url])
-    except Exception as e:
-        print(f"Error: {e}")
+    # Default to the user's actual Windows Downloads folder
+    if not download_path:
+        download_path = str(Path.home() / 'Downloads')
 
+    # Expand environment variables and ~
+    download_path = os.path.expandvars(os.path.expanduser(download_path))
+
+    # Convert relative paths to paths relative to the project directory
+    if not os.path.isabs(download_path):
+        download_path = str(base_dir / download_path)
+
+    os.makedirs(download_path, exist_ok=True)
+
+    if not ffmpeg_path.is_file():
+        raise FileNotFoundError(
+            f"FFmpeg was not found at:\n{ffmpeg_path}"
+        )
+
+    options = {
+        'outtmpl': '%(title)s.%(ext)s',
+        'format': 'bv*+ba/b',
+        'ffmpeg_location': str(ffmpeg_path),
+        'noplaylist': True,
+        'verbose': True,
+        'paths': {
+            'home': download_path
+        }
+    }
+
+    with yt_dlp.YoutubeDL(options) as ydl:
+        ydl.download([url])
