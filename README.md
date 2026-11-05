@@ -75,7 +75,7 @@ Video Downloader/
 │
 ├── GUI.py
 ├── downloader.py
-├── deafault_location.txt
+├── default_location.txt
 ├── icon.png
 │
 └── ffmpeg/
@@ -100,7 +100,7 @@ python GUI.py
 
 ### Download Location
 
-The application uses `deafault_location.txt` to remember your preferred download directory.
+The application uses `default_location.txt` to remember your preferred download directory.
 
 You can enter a custom directory in the GUI or edit the text file manually.
 
